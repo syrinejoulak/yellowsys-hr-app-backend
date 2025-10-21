@@ -1,9 +1,10 @@
 // src/app.module.ts
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { InjectConnection } from '@nestjs/mongoose';
+import { MongooseModule, InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { APP_PIPE } from '@nestjs/core';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -38,6 +39,17 @@ import { Connection } from 'mongoose';
         return connection;
       },
     }),
+    UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+      }),
+    },
   ],
 })
 export class AppModule implements OnModuleInit {

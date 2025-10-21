@@ -1,0 +1,193 @@
+### HR Backend API Documentation & Testing File
+### Use this file with VS Code REST Client extension (Humao.rest-client)
+### Install: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### ============================================================================
+### USERS ENDPOINTS
+### ============================================================================
+
+### 1. Create Admin User
+### Method: POST
+### Description: Creates a new admin user with full privileges
+### Endpoint: {{baseUrl}}/users/create-admin
+### Authentication: None (initial setup endpoint)
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "admin@company.com",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "position": "HR Manager",
+  "country": "France"
+}
+
+###
+
+### 2. Create Admin User - Tunisia Example
+### Method: POST
+### Description: Creates a new admin user based in Tunisia
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "tunisia.admin@company.com",
+  "password": "tunisiaSecurePass123",
+  "firstName": "Ahmed",
+  "lastName": "Ben Ali",
+  "position": "Regional HR Director",
+  "country": "Tunisia"
+}
+
+###
+
+### 3. Get All Users
+### Method: GET
+### Description: Retrieves all users in the system (admin endpoint)
+### Endpoint: {{baseUrl}}/users
+### Note: This will return empty array initially, populate with create-admin first
+GET {{baseUrl}}/users
+
+###
+
+### ============================================================================
+### ERROR TESTING EXAMPLES
+### ============================================================================
+
+### Test Case: Duplicate Email
+### Expected: 409 Conflict - User with this email already exists
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "admin@company.com",
+  "password": "anotherPassword123",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "position": "HR Assistant",
+  "country": "France"
+}
+
+###
+
+### Test Case: Invalid Email Format
+### Expected: 400 Bad Request - Validation error
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid-email-format",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "position": "HR Manager",
+  "country": "France"
+}
+
+###
+
+### Test Case: Password Too Short
+### Expected: 400 Bad Request - Password must be at least 8 characters
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "short.password@company.com",
+  "password": "123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "position": "HR Manager",
+  "country": "France"
+}
+
+###
+
+### Test Case: Missing Required Fields
+### Expected: 400 Bad Request - Validation error for missing fields
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "missing.fields@company.com",
+  "password": "securePassword123"
+}
+
+###
+
+### Test Case: Invalid Country Enum
+### Expected: 400 Bad Request - Country must be 'France' or 'Tunisia'
+POST {{baseUrl}}/users/create-admin
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid.country@company.com",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "position": "HR Manager",
+  "country": "Spain"
+}
+
+###
+
+### ============================================================================
+### HEALTH CHECK & SYSTEM ENDPOINTS
+### ============================================================================
+
+### Health Check
+### Method: GET
+### Description: Basic health check to verify server is running
+GET {{baseUrl}}/
+
+###
+
+### ============================================================================
+### FUTURE ENDPOINTS (PLANNED)
+### ============================================================================
+
+### User Login (Not Implemented Yet)
+### Method: POST
+### Description: Authenticate user and return JWT token
+# POST {{baseUrl}}/auth/login
+# Content-Type: {{contentType}}
+#
+# {
+#   "email": "admin@company.com",
+#   "password": "securePassword123"
+# }
+
+###
+
+### Get Current User Profile (Not Implemented Yet)
+### Method: GET
+### Description: Get current authenticated user's profile
+# GET {{baseUrl}}/users/profile
+# Authorization: Bearer <jwt-token>
+
+###
+
+### Update User (Not Implemented Yet)
+### Method: PUT
+### Description: Update user information
+# PUT {{baseUrl}}/users/:id
+# Content-Type: {{contentType}}
+# Authorization: Bearer <jwt-token>
+#
+# {
+#   "firstName": "Updated Name",
+#   "position": "Senior HR Manager"
+# }
+
+###
+
+### Delete User (Not Implemented Yet)
+### Method: DELETE
+### Description: Deactivate user account
+# DELETE {{baseUrl}}/users/:id
+# Authorization: Bearer <jwt-token>
+
+###
