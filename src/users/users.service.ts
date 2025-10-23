@@ -85,6 +85,101 @@ export class UsersService {
   }
 
   /**
+   * Check if system is already initialized (has any users)
+   *
+   * @returns boolean - true if system has users, false if empty
+   */
+  async isSystemInitialized(): Promise<boolean> {
+    const userCount = await this.userModel.countDocuments().exec();
+    return userCount > 0;
+  }
+
+  /**
+   * Initialize system with first HR admin (only works if system is empty)
+   *
+   * @param userData - HR admin data
+   * @returns Created HR admin user
+   */
+  async initializeSystem(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    position: string;
+    country: 'France' | 'Tunisia';
+  }): Promise<UserDocument> {
+    this.logger.log('Attempting to initialize system with first HR admin');
+
+    // Check if system already has users
+    const isInitialized = await this.isSystemInitialized();
+    if (isInitialized) {
+      throw new ConflictException('System is already initialized');
+    }
+
+    // Create HR admin using existing createAdmin method
+    return this.createAdmin(userData);
+  }
+
+  /**
+   * Create a new user (HR admin only)
+   * Generates random password and sends email reset token
+   *
+   * @param userData - User data (without password)
+   * @returns Created user with generated password info
+   */
+  async createUser(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    position: string;
+    country: 'France' | 'Tunisia';
+  }): Promise<{ user: UserDocument; generatedPassword: string }> {
+    this.logger.log(`Creating new user with email: ${userData.email}`);
+
+    // Check if user already exists
+    const existingUser = await this.userModel.findOne({
+      email: userData.email,
+    });
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    // Generate random password
+    const generatedPassword = this.generateRandomPassword();
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(generatedPassword, saltRounds);
+
+    // Create new user
+    const newUser = new this.userModel({
+      ...userData,
+      password: hashedPassword,
+      isAdmin: false, // Regular user, not admin
+      isActive: true,
+      firstLogin: true, // Must change password on first login
+      hireDate: new Date(),
+    });
+
+    const savedUser = await newUser.save();
+    this.logger.log(`User created successfully with ID: ${savedUser._id}`);
+
+    return { user: savedUser, generatedPassword };
+  }
+
+  /**
+   * Generate random password for new users
+   *
+   * @returns Random password string
+   */
+  private generateRandomPassword(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  }
+
+  /**
    * Get all users (for admin dashboard)
    *
    * @returns Array of all users
