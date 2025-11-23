@@ -4,8 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule, InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { APP_PIPE } from '@nestjs/core';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -40,8 +39,7 @@ import { AuthModule } from './auth/auth.module';
         return connection;
       },
     }),
-    UsersModule,
-    AuthModule,
+    UserModule,
   ],
   providers: [
     {
