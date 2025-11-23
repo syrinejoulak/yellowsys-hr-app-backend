@@ -1,0 +1,36 @@
+### Auth & Admin Bootstrap Requests
+### Use with VS Code REST Client (Humao.rest-client)
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+@adminKey = CHANGE_ME
+
+### Create Admin User (HR bootstrap only)
+POST {{baseUrl}}/users/admin
+Content-Type: {{contentType}}
+x-admin-api-key: {{adminKey}}
+
+{
+  "email": "admin@company.com",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "position": "HR Manager",
+  "hireDate": "2022-01-01",
+  "country": "France"
+}
+
+### Duplicate Email Test (should return 409)
+POST {{baseUrl}}/users/admin
+Content-Type: {{contentType}}
+x-admin-api-key: {{adminKey}}
+
+{
+  "email": "admin@company.com",
+  "password": "AnotherPassword123",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "position": "HR Specialist",
+  "hireDate": "2023-05-01",
+  "country": "France"
+}
